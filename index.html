@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Data Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Data Form</h1>
+  
+  <form id="user-form">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Submitted Data</h2>
+  <table id="user-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data rows will go here -->
+    </tbody>
+  </table>
+
+  <script>
+    // Backend URL for GitHub Codespaces
+    const backendUrl = "https://ubiquitous-parakeet-vxq7pw7pwqvfx996-3000.app.github.dev/";
+
+    // Handle form submission
+    document.getElementById("user-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+
+      // Send data to the backend via a POST request
+      fetch(`${backendUrl}/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // This should log the success message
+        // After submission, reload the user data
+        loadUserData();
+      })
+      .catch(error => console.error('Error submitting data:', error));
+    });
+
+    // Load existing user data from the backend and display it
+    function loadUserData() {
+      fetch(`${backendUrl}`)
+        .then(response => response.json())  // Parse response as JSON
+        .then(data => {
+          const tbody = document.getElementById("user-table").getElementsByTagName('tbody')[0];
+          tbody.innerHTML = '';  // Clear existing rows
+
+          // Loop through each row in the data and create a new row in the table
+          data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${row.name}</td><td>${row.email}</td>`;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Initial data load
+    loadUserData();
+  </script>
+</body>
+</html>
