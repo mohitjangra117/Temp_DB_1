@@ -38,19 +38,60 @@ connection.query(
   }
 );
 
-// Route to render the user data as JSON
+// Route to render the HTML page with form
 app.get('/', (req, res) => {
   connection.query('SELECT * FROM user_data', (err, rows) => {
     if (err) {
-      return res.status(500).json({ error: 'Error fetching data from database.' });
+      return res.status(500).send('Error fetching data from database.');
     }
 
-    // Send the rows as JSON to the frontend
-    res.json(rows);
+    let tableRows = '';
+    rows.forEach(row => {
+      tableRows += `<tr>
+                      <td>${row.name}</td>
+                      <td>${row.email}</td>
+                    </tr>`;
+    });
+
+    res.send(`
+      <html>
+        <head>
+          <title>User Data Form</title>
+          <style>
+            table { width: 100%; border-collapse: collapse; }
+            table, th, td { border: 1px solid black; }
+            th, td { padding: 8px; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <h1>User Data Form</h1>
+          <form method="POST" action="/submit">
+            <label for="name">Name:</label><br>
+            <input type="text" id="name" name="name" required><br><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br><br>
+            <button type="submit">Submit</button>
+          </form>
+
+          <h2>Submitted Data</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
   });
 });
 
-// Route to handle form submission and save data to the database
+// Route to handle form submission
 app.post('/submit', (req, res) => {
   const { name, email } = req.body;
 
@@ -60,11 +101,11 @@ app.post('/submit', (req, res) => {
     [name, email],
     (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Error saving data to database.' });
+        return res.status(500).send('Error saving data to database.');
       }
 
-      // Respond with a success message
-      res.json({ message: 'Data submitted successfully' });
+      // Redirect back to the home page to show the updated data
+      res.redirect('/');
     }
   );
 });
