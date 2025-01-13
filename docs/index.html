@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express with MySQL</title>
+</head>
+<body>
+  <h1>Welcome to Express with MySQL!</h1>
+  <p id="db-time">Loading MySQL Time...</p>
+
+  <script>
+    // Fetch the current time from the backend
+    fetch('https://ubiquitous-parakeet-vxq7pw7pwqvfx996-3000.app.github.dev/db') // Replace with your Codespace's URL
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('db-time').innerText = data;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  </script>
+</body>
+</html>
